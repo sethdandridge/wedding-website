@@ -1,0 +1,18 @@
+{% extends 'base.jinja2' %}
+
+{% block content %}
+    <div class="inner-main text-center">
+      <div class="d-flex justify-content-center align-items-center">
+        <div>
+          <h5>Is this you?</h5>
+          <p class="fs-4 mt-4">{{ guest_name }}</p>
+          <div class="d-grid mx-auto mt-4 col-auto">
+            <div class="col-auto mt-2">
+              <button type="submit" class="px-5" onclick="location.href='{{ url }}';">Yes!</button>
+            </div>
+            <p class="mt-4"><a href="/rsvp">...no, go back</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,12 @@
+.DS_Store
+*/.DS_Store
+.idea/
+.env/
+wedding_website/static/css/custom.css
+instance/
+node_modules/
+fonts/
+css/
+index.html
+images/
+*.pyc
