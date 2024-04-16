@@ -209,7 +209,7 @@ main {
   font-size: 1.05em;
 }
 
-main > div.inner-main {
+main > section.inner-main {
   @extend .double-outline, .mx-3, .px-4, .my-4;
 }
 
