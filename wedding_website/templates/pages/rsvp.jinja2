@@ -9,7 +9,7 @@
             <label for="name" class="form-label">Please enter your name</label>
             <input type="text" name="name" class="form-control form-control-lg text-center" id="name">
             {% for message in get_flashed_messages() %}
-              <div class="invalid-feedback fs-5">{{ message }}</div>
+              <div class="invalid-feedback fs-5">{{ message|e }}</div>
             {% endfor %}
           </div>
           <div class="d-grid mx-auto col-auto">
