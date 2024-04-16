@@ -1,10 +1,14 @@
 from typing import Any, Union
 
 from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, session, url_for
+from werkzeug.exceptions import BadRequest
 
 from wedding_website.exceptions import GuestNotFoundError
+from wedding_website.logger import get_logger
 from wedding_website.models.guest import Guest
 from wedding_website.models.household import Household
+
+logger = get_logger()
 
 bp = Blueprint("rsvp", __name__)
 
@@ -24,7 +28,6 @@ def _persist_guests(guests: list[Guest]) -> None:
 def rsvp_redirect(household_cute_subdomain: str) -> Response:
     household_cute_subdomain = household_cute_subdomain.rstrip(".and")
     household_cute_key = household_cute_subdomain.replace(".", "-")
-    current_app.logger.info(f"household_cute_key: {household_cute_key}")
     return redirect(f"//{current_app.config['SERVER_NAME']}/rsvp/{household_cute_key}/ceremony", code=302)
 
 
@@ -37,16 +40,16 @@ def get_rsvp() -> Any:
 def post_rsvp() -> Any:
     name = request.form.get("name")
     if "initial_lookup" in session:
-        print(session["initial_lookup"], "looked up name", name)
+        logger.warning(f"{session['initial_lookup']} looked up name {name}")
     if not name:
         flash("Please enter your name.")
-        return render_template("pages/rsvp.jinja2")
+        return Response(render_template("pages/rsvp.jinja2"), status=BadRequest.code)
+    name = name.strip().lower()
     try:
-        name = name.strip().lower()
         guest = Guest.from_alias(name)
     except GuestNotFoundError:
         flash(f"Could not find {name} in the guest list. Please try again.")  # Todo: add help
-        return render_template("pages/rsvp.jinja2")
+        return Response(render_template("pages/rsvp.jinja2"), status=BadRequest.code)
     return render_template(
         "pages/rsvp_name_confirmation.jinja2",
         url=f"//{guest.household.cute_subdomain}.and.{current_app.config['SERVER_NAME']}",
