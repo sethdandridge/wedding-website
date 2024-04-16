@@ -1,0 +1,38 @@
+{% extends 'base.jinja2' %}
+
+{% block content %}
+    <section class="inner-main text-center">
+      <h4>RSVP</h4>
+      <p>Are you able to join us at our wedding?</p>
+      <div class="d-flex justify-content-center align-items-center">
+        <form method="POST">
+          {% for guest in guests %}
+          {% if not guest.is_plus_one %}
+          <h5 class="mb-0">{{ guest.name }}</h5>
+          <input type="radio" class="btn-check never-hidden-input" name="guest-{{ loop.index }}" value="yes" id="guest-{{ loop.index }}-yes" autocomplete="off">
+          <label for="guest-{{ loop.index }}-yes">Enthusiastic Yes</label>
+          <input type="radio" class="btn-check never-hidden-input" name="guest-{{ loop.index }}" value="no" id="guest-{{ loop.index }}-no" autocomplete="off">
+          <label for="guest-{{ loop.index }}-no">Regretful No</label>
+          {% else %}
+          <div id="guest-{{ loop.index }}" class="possibly-hidden-input">
+            <h5 class="mb-0">Guest</h5>
+            <input type="radio" class="btn-check" name="guest-{{ loop.index }}" value="yes" id="guest-{{ loop.index }}-yes" autocomplete="off">
+            <label for=guest-{{ loop.index }}-yes>Enthusiastic Yes</label>
+            <input type="radio" class="btn-check" name="guest-{{ loop.index }}" value="no" id="guest-{{ loop.index }}-no" autocomplete="off">
+            <label for="guest-{{ loop.index }}-no">Regretful No</label>
+            <div id="guest-{{ loop.index }}-name" class="possibly-hidden-input">
+              <label for="guest-{{ loop.index }}-name-field" class="form-label">Guest Name?</label>
+              <input type="text" name="guest-{{ loop.index }}-name" class="form-control form-control-lg text-center" id="guest-{{ loop.index }}-name-field">
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+          <div class="d-grid mx-auto col-auto mt-4 justify-content-center d-none" id="submit-button-div">
+            <div class="col-auto">
+              <button type="submit" class="px-5" id="submit-button">Next Event</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+{% endblock %}

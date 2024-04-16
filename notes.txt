@@ -1,0 +1,20 @@
+planned schema
+
+_household_
+id
+cute_name
+is_invited_dinner
+is_invited_brunch
+
+_guest_
+id
+household_id
+is_plus_one
+wedding_response
+dinner_response
+brunch_response
+updated
+
+_guest_to_alias_
+guest_id
+alias

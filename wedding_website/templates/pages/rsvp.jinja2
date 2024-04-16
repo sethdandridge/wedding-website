@@ -1,0 +1,23 @@
+{% extends 'base.jinja2' %}
+
+{% block content %}
+    <section class="inner-main text-center">
+      <h4>RSVP</h4>
+      <div class="d-flex justify-content-center align-items-center">
+        <form method="POST">
+          <div class="mb-3">
+            <label for="name" class="form-label">Please enter your name</label>
+            <input type="text" name="name" class="form-control form-control-lg text-center" id="name">
+            {% for message in get_flashed_messages() %}
+              <div class="invalid-feedback fs-5">{{ message }}</div>
+            {% endfor %}
+          </div>
+          <div class="d-grid mx-auto col-auto">
+            <div class="col-auto">
+              <button type="submit" class="px-5">Find RSVP</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+{% endblock %}

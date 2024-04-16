@@ -1,0 +1,24 @@
+{% extends 'base.jinja2' %}
+
+{% block content %}
+    <section class="inner-main text-center">
+      <h4>RSVP</h4>
+      <p>Will you be able to join us at the rehearsal dinner?</p>
+      <div class="d-flex justify-content-center align-items-center">
+        <form method="POST">
+          {% for guest in guests %}
+          <h5 class="mb-0">{{ guest.name }}</h5>
+          <input type="radio" class="btn-check never-hidden-input" name="guest-{{ loop.index }}" value="yes" id="guest-{{ loop.index }}-yes" autocomplete="off">
+          <label for="guest-{{ loop.index }}-yes">Enthusiastic Yes</label>
+          <input type="radio" class="btn-check never-hidden-input" name="guest-{{ loop.index }}" value="no" id="guest-{{ loop.index }}-no" autocomplete="off">
+          <label for="guest-{{ loop.index }}-no">Regretful No</label>
+          {% endfor %}
+          <div class="d-grid mx-auto col-auto mt-4 justify-content-center d-none" id="submit-button-div">
+            <div class="col-auto">
+              <button type="submit" class="px-5 dont-toggle" id="submit-button">Next Event</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+{% endblock %}
