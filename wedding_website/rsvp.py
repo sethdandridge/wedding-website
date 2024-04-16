@@ -77,15 +77,17 @@ def post_rsvp_form_ceremony(household_cute_name: str) -> Union[Response, str]:
             guest.dinner_response = False
             guest.brunch_response = False
     session["guests"] = guests
-    if not any(guest.wedding_response for guest in guests):
+    is_anyone_coming = any(guest.wedding_response for guest in guests)
+    if is_anyone_coming is False:
         _persist_guests(guests)
         session["is_coming"] = False
-        return redirect(url_for("rsvp.get_rsvp_confirmation"), code=302)
-    session["is_coming"] = True
-    if household.is_invited_dinner:
-        return redirect(url_for("rsvp.get_rsvp_form_dinner", household_cute_name=household_cute_name), code=302)
+        return redirect(url_for("rsvp.get_rsvp_confirmation"), code=302)  # No one is coming
     else:
-        return redirect(url_for("rsvp.get_rsvp_form_brunch", household_cute_name=household_cute_name), code=302)
+        session["is_coming"] = True
+        if household.is_invited_dinner:
+            return redirect(url_for("rsvp.get_rsvp_form_dinner", household_cute_name=household_cute_name), code=302)
+        else:
+            return redirect(url_for("rsvp.get_rsvp_form_brunch", household_cute_name=household_cute_name), code=302)
 
 
 @bp.route("/rsvp/<household_cute_name>/dinner")
