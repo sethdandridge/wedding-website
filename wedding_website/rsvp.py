@@ -91,14 +91,14 @@ def post_rsvp_form_ceremony(household_cute_name: str) -> Union[Response, str]:
 @bp.route("/rsvp/<household_cute_name>/dinner")
 def get_rsvp_form_dinner(household_cute_name: str) -> Any:
     guests = _get_guests()
-    guests = [g for g in guests if not (not g.wedding_response and g.is_plus_one)]
-    return render_template("pages/rsvp_form_dinner.jinja2", guests=guests)
+    indexed_guests = [g for g in guests if g.wedding_response or not g.is_plus_one]
+    return render_template("pages/rsvp_form_dinner.jinja2", guests=indexed_guests)
 
 
 @bp.route("/rsvp/<household_cute_name>/dinner", methods=["POST"])
 def post_rsvp_form_dinner(household_cute_name: str) -> Response:
     guests = _get_guests()
-    indexed_guests = [g for g in guests if not (not g.wedding_response and g.is_plus_one)]
+    indexed_guests = guests = [g for g in guests if g.wedding_response or not g.is_plus_one]
     for i, guest in enumerate(indexed_guests, start=1):
         guest.dinner_response = request.form.get(f"guest-{i}") == "yes"
     session["guests"] = guests
