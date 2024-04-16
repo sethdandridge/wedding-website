@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS guest (
     brunch_response BOOLEAN,
     updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (household_id) REFERENCES household(id),
-    CHECK ((is_plus_one = 1 AND name IS NULL) OR (is_plus_one = 1 AND name IS NOT NULL) OR (is_plus_one = 0 AND name IS NOT NULL) OR (is_plus_one = 0 AND name IS NULL))
+    CHECK ((is_plus_one = 1 AND name IS NULL) OR (is_plus_one = 1 AND name IS NOT NULL) OR (is_plus_one = 0 AND name IS NOT NULL))
 );
 
 CREATE TRIGGER IF NOT EXISTS update_timestamp AFTER UPDATE ON guest
