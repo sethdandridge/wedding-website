@@ -14,23 +14,23 @@ class Household:
     is_invited_dinner: bool
     is_invited_brunch: bool
 
-    @staticmethod
-    def from_id(household_id: int) -> "Household":
+    @classmethod
+    def from_id(cls, household_id: int) -> "Household":
         with get_db_cursor() as cursor:
             cursor.execute("SELECT * FROM household WHERE id = ?", (household_id,))
             row = cursor.fetchone()
         if row is None:
             raise HouseholdNotFoundError(f"Household with id {household_id} not found")
-        return Household(*row)
+        return cls(*row)
 
-    @staticmethod
-    def from_cute_name(cute_name: str) -> "Household":
+    @classmethod
+    def from_cute_name(cls, cute_name: str) -> "Household":
         with get_db_cursor() as cursor:
             cursor.execute("SELECT * FROM household WHERE cute_name = ?", (cute_name,))
             row = cursor.fetchone()
         if row is None:
             raise HouseholdNotFoundError(f"Household with cute name {cute_name} not found")
-        return Household(*row)
+        return cls(*row)
 
     @property
     def guests(self) -> list[Guest]:

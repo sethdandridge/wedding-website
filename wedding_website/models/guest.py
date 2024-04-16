@@ -15,8 +15,8 @@ class Guest:
     brunch_response: bool
     updated: str  # Assuming 'updated' is stored as a TEXT timestamp in SQLite
 
-    @staticmethod
-    def from_alias(alias: str) -> "Guest":
+    @classmethod
+    def from_alias(cls, alias: str) -> "Guest":
         with get_db_cursor() as cursor:
             query = """
             SELECT g.id, g.household_id, g.name, g.is_plus_one, g.wedding_response,
@@ -29,7 +29,7 @@ class Guest:
             row = cursor.fetchone()
         if row is None:
             raise GuestNotFoundError(f"Guest with alias {alias} not found")
-        guest = Guest(*row)
+        guest = cls(*row)
         return guest
 
     @property
