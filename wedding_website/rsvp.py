@@ -52,7 +52,8 @@ def post_rsvp() -> Any:
         return Response(render_template("pages/rsvp.jinja2"), status=BadRequest.code)
     return render_template(
         "pages/rsvp_name_confirmation.jinja2",
-        url=f"//{guest.household.cute_subdomain}.and.{current_app.config['SERVER_NAME']}",
+        # url=f"//{guest.household.cute_subdomain}.and.{current_app.config['SERVER_NAME']}",
+        url=url_for("rsvp.get_rsvp_form_ceremony", household_cute_name=guest.household.cute_name),
         guest_name=guest.name,
     )
 
