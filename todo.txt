@@ -1,9 +1,9 @@
 DONE Fix FAQ
-RSVP
-Be sneaky
+DONE RSVP
+DONE Be sneaky
+DONE Fun animations, corgi
+DONE Fix logging
+DONE Session
 Registry Landing Page
 Better schedule?
 Better home page. Photo?
-Fun animations, corgi
-Fix logging
-Session

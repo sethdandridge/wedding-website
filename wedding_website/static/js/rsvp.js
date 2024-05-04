@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const frankieHoverTarget = document.getElementById('frankie-hover-target');
+    const frankieCity = document.getElementById('frankie-city');
+    frankieHoverTarget.addEventListener('mouseover', function() {
+        frankieCity.style.display = 'block';
+    });
+    frankieHoverTarget.addEventListener('mouseout', function() {
+        frankieCity.style.display = 'none';
+    });
 
     const form = document.querySelector('form'); // Select the form
     if (!form) return;

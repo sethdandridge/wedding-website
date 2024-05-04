@@ -3,6 +3,7 @@ from typing import Any, Union
 from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, session, url_for
 from werkzeug.exceptions import BadRequest
 
+from wedding_website.client_caching import client_cached
 from wedding_website.exceptions import GuestNotFoundError
 from wedding_website.logger import get_logger
 from wedding_website.models.guest import Guest
@@ -31,11 +32,14 @@ def rsvp_redirect(household_cute_subdomain: str) -> Response:
     return redirect(f"//{current_app.config['SERVER_NAME']}/rsvp/{household_cute_key}/ceremony", code=302)
 
 
+@bp.route("/RSVP")
 @bp.route("/rsvp")
+@client_cached
 def get_rsvp() -> Any:
     return render_template("pages/rsvp.jinja2")
 
 
+@bp.route("/RSVP", methods=["POST"])
 @bp.route("/rsvp", methods=["POST"])
 def post_rsvp() -> Any:
     name = request.form.get("name")
@@ -52,14 +56,21 @@ def post_rsvp() -> Any:
         return Response(render_template("pages/rsvp.jinja2"), status=BadRequest.code)
     return render_template(
         "pages/rsvp_name_confirmation.jinja2",
-        # url=f"//{guest.household.cute_subdomain}.and.{current_app.config['SERVER_NAME']}",
         url=url_for("rsvp.get_rsvp_form_ceremony", household_cute_name=guest.household.cute_name),
         guest_name=guest.name,
     )
 
 
-@bp.route("/rsvp/<household_cute_name>/ceremony")
+@bp.route("/rsvp/confirmation")
+def get_rsvp_confirmation() -> Any:
+    is_coming = bool(session.get("is_coming"))
+    return render_template("pages/rsvp_confirmation.jinja2", is_coming=is_coming)
+
+
+@bp.route("/RSVP/<household_cute_name>")
+@bp.route("/rsvp/<household_cute_name>")
 def get_rsvp_form_ceremony(household_cute_name: str) -> Any:
+    household_cute_name = household_cute_name.lower()
     if "initial_lookup" not in session:
         session["initial_lookup"] = household_cute_name
     household = Household.from_cute_name(household_cute_name)
@@ -68,8 +79,10 @@ def get_rsvp_form_ceremony(household_cute_name: str) -> Any:
     return render_template("pages/rsvp_form.jinja2", guests=guests)
 
 
-@bp.route("/rsvp/<household_cute_name>/ceremony", methods=["POST"])
+@bp.route("/RSVP/<household_cute_name>", methods=["POST"])
+@bp.route("/rsvp/<household_cute_name>", methods=["POST"])
 def post_rsvp_form_ceremony(household_cute_name: str) -> Union[Response, str]:
+    household_cute_name = household_cute_name.lower()
     household = Household.from_cute_name(household_cute_name)
     guests = _get_guests()
     for i, guest in enumerate(guests, start=1):
@@ -127,9 +140,3 @@ def post_rsvp_form_brunch(household_cute_name: str) -> Response:
     session["guests"] = guests
     _persist_guests(guests)
     return redirect(url_for("rsvp.get_rsvp_confirmation"), code=302)
-
-
-@bp.route("/rsvp/confirmation")
-def get_rsvp_confirmation() -> Any:
-    is_coming = bool(session.get("is_coming"))
-    return render_template("pages/rsvp_confirmation.jinja2", is_coming=is_coming)
