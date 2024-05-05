@@ -9,4 +9,5 @@ fonts/
 css/
 index.html
 images/
+scripts/qr_codes/codes/
 *.pyc

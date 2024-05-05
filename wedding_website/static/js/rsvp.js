@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const frankieHoverTarget = document.getElementById('frankie-hover-target');
+    const frankieCity = document.getElementById('frankie-city');
+    frankieHoverTarget.addEventListener('mouseover', function() {
+        frankieCity.style.display = 'block';
+    });
+    frankieHoverTarget.addEventListener('mouseout', function() {
+        frankieCity.style.display = 'none';
+    });
 
     const form = document.querySelector('form'); // Select the form
     if (!form) return;
@@ -47,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const checkSubmitText = () => {
         const neverHiddenInputs = form.querySelectorAll('.never-hidden-input');
-        // Create a list of neverHiddenInputs only if the id ends in 'yes'
+        // Create a list of neverHiddenInputs only if the guest_id ends in 'yes'
         const neverHiddenInputsYes = Array.from(neverHiddenInputs).filter(input => input.id.endsWith('yes'));
         // Check if any of the yes inputs are checked
         const anyYesChecked = neverHiddenInputsYes.some(input => input.checked);

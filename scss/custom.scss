@@ -97,6 +97,44 @@ header a {
   text-decoration: none;
 }
 
+#city-container {
+  // display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40vw;
+  padding-top: 9vw;
+  margin-bottom: 1em;
+  position: relative;
+  display: inline-block;
+}
+
+#city {
+  background-size: cover;
+  //transition: background-image 0.3s ease;
+  width: 40vw;
+  height: calc(40vw * (484/1218));
+  background-image: url('../images/city.png');
+}
+
+#frankie-city {
+  position: absolute;
+  pointer-events: none;
+  display: none;
+  background-size: cover;
+  //transition: background-image 0.3s ease;
+  width: 40vw;
+  height: calc(40vw * (484/1218));
+  background-image: url('../images/city-franks.png');
+}
+
+#frankie-hover-target {
+  position: relative;
+  top: 0%;
+  left: 63%;
+  width: 10%;
+  height: 22%;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////// Menus //////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +224,7 @@ header a {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 #mobileMenu div {
-  @extend .p-2
+  @extend .p-2;
 }
 
 div#menuItems a, #mobileMenu a {
