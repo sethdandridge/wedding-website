@@ -1,14 +1,15 @@
 import sqlite3
+from contextlib import closing
 
 import qrcode
 from PIL import Image
 
-conn = sqlite3.connect("../../instance/wedding_website.sqlite")
-c = conn.cursor()
-c.execute("SELECT id, cute_name FROM household;")
-households = c.fetchall()
-c.close()
-conn.close()
+LIGHT_LAVENDER_BLUE = "#d6d7ed"
+
+with closing(sqlite3.connect("../../instance/wedding_website.sqlite")) as conn:
+    with closing(conn.cursor()) as c:
+        c.execute("SELECT id, cute_name FROM household;")
+        households = c.fetchall()
 
 logo = Image.open("dogsie.png").convert("RGBA")
 # Resize logo to fit into the QR code
@@ -30,7 +31,7 @@ for household in households:
     print(household_id, url)
 
     # Create QR code image with a transparent background
-    img = qr.make_image(fill_color="#d6d7ed", back_color="transparent").convert("RGBA")
+    img = qr.make_image(fill_color=LIGHT_LAVENDER_BLUE, back_color="transparent").convert("RGBA")
 
     # Calculate dimensions for logo box
     logo_box = (

@@ -12,7 +12,7 @@ for guest in guests:
         continue
     if guest["Household ID"] == "":
         continue
-    id = int(guest["ID"])
+    guest_id = int(guest["ID"])
     household_id = int(guest["Household ID"])
     is_plus_one = guest["First Name"] == "Guest"
     if is_plus_one is True:
@@ -23,16 +23,16 @@ for guest in guests:
         aliases = [g.lower() for g in guest["Aliases Lower"].split(",")]
     try:
         c.execute(
-            "INSERT INTO guest (id, household_id, name, is_plus_one) VALUES (?, ?, ?, ?)",
-            (id, household_id, name, is_plus_one),
+            "INSERT INTO guest (guest_id, household_id, name, is_plus_one) VALUES (?, ?, ?, ?)",
+            (guest_id, household_id, name, is_plus_one),
         )
     except sqlite3.IntegrityError:
-        print(f"Guest {name} {id} already exists in the database")
+        print(f"Guest {name} {guest_id} already exists in the database")
     for alias in aliases:
         try:
             c.execute(
                 "INSERT INTO guest_to_alias (guest_id, alias) VALUES (?, ?)",
-                (id, alias.strip()),
+                (guest_id, alias.strip()),
             )
         except sqlite3.IntegrityError:
             print(f"Alias {alias} already exists in the database")
