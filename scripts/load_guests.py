@@ -1,11 +1,11 @@
 import csv
 import sqlite3
 
-with open("../instance/guests.csv") as f:
+with open("instance/guests.csv") as f:
     reader = csv.DictReader(f)
     guests = list(reader)
 
-conn = sqlite3.connect("../instance/wedding_website.sqlite")
+conn = sqlite3.connect("instance/wedding_website.sqlite")
 c = conn.cursor()
 for guest in guests:
     if guest["ID"] == "":
@@ -23,7 +23,7 @@ for guest in guests:
         aliases = [g.lower() for g in guest["Aliases Lower"].split(",")]
     try:
         c.execute(
-            "INSERT INTO guest (guest_id, household_id, name, is_plus_one) VALUES (?, ?, ?, ?)",
+            "INSERT INTO guest (id, household_id, name, is_plus_one) VALUES (?, ?, ?, ?)",
             (guest_id, household_id, name, is_plus_one),
         )
     except sqlite3.IntegrityError:
