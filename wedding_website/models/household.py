@@ -17,10 +17,10 @@ class Household:
     @classmethod
     def from_id(cls, household_id: int) -> "Household":
         with get_db_cursor() as cursor:
-            cursor.execute("SELECT * FROM household WHERE guest_id = ?", (household_id,))
+            cursor.execute("SELECT * FROM household WHERE id = ?", (household_id,))
             row = cursor.fetchone()
         if row is None:
-            raise HouseholdNotFoundError(f"Household with guest_id {household_id} not found")
+            raise HouseholdNotFoundError(f"Household with id {household_id} not found")
         return cls(*row)
 
     @classmethod
@@ -35,7 +35,7 @@ class Household:
     @property
     def guests(self) -> list[Guest]:
         with get_db_cursor() as cursor:
-            cursor.execute("SELECT * FROM guest WHERE household_id = ? ORDER BY guest_id;", (self.id,))
+            cursor.execute("SELECT * FROM guest WHERE household_id = ? ORDER BY id;", (self.id,))
             rows = cursor.fetchall()
         guests = [Guest(*row) for row in rows]
         current_app.logger.info(f"Found {guests} guests for household {self.id}")

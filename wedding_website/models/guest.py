@@ -19,10 +19,10 @@ class Guest:
     def from_alias(cls, alias: str) -> "Guest":
         with get_db_cursor() as cursor:
             query = """
-            SELECT g.guest_id, g.household_id, g.name, g.is_plus_one, g.wedding_response,
+            SELECT g.id, g.household_id, g.name, g.is_plus_one, g.wedding_response,
                    g.dinner_response, g.brunch_response, g.updated
             FROM guest g
-            JOIN guest_to_alias gta ON g.guest_id = gta.guest_id
+            JOIN guest_to_alias gta ON g.id = gta.guest_id
             WHERE gta.alias = ?
             """
             cursor.execute(query, (alias,))
@@ -43,7 +43,7 @@ class Guest:
             query = """
             UPDATE guest
             SET name = ?, wedding_response = ?, dinner_response = ?, brunch_response = ?
-            WHERE guest_id = ?
+            WHERE id = ?
             """
             cursor.execute(
                 query, (self.name, self.wedding_response, self.dinner_response, self.brunch_response, self.id)
