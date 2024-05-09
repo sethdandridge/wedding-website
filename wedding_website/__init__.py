@@ -13,8 +13,7 @@ def create_app(testing: bool = False) -> Flask:
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True, static_folder=None)
     app.config["SECRET_KEY"] = "INSECURE"
-    app.config["SERVER_NAME"] = "localhost:2700"
-    app.config["DATABASE"] = os.path.join(app.instance_path, "wedding_website-test.sqlite")
+    app.config["DATABASE"] = os.path.join(app.instance_path, "wedding_website.sqlite")
 
     # Ignore slashes at the end of URLs
     app.url_map.strict_slashes = False
