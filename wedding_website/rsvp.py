@@ -25,6 +25,11 @@ def _persist_guests(guests: list[Guest]) -> None:
         guest.save()
 
 
+@bp.before_request
+def make_session_permanent() -> None:
+    session.permanent = True
+
+
 @bp.route("/", subdomain="<household_cute_subdomain>")
 def rsvp_redirect(household_cute_subdomain: str) -> Response:
     household_cute_subdomain = household_cute_subdomain.rstrip(".and")
@@ -48,9 +53,9 @@ def post_rsvp() -> Any:
     if not name:
         flash("Please enter your name.")
         return Response(render_template("pages/rsvp.jinja2"), status=BadRequest.code)
-    name = name.strip().lower()
+    lowercase_name = name.strip().lower()
     try:
-        guest = Guest.from_alias(name)
+        guest = Guest.from_alias(lowercase_name)
     except GuestNotFoundError:
         flash(f"Could not find {name} in the guest list. Please try again.")  # Todo: add help
         return Response(render_template("pages/rsvp.jinja2"), status=BadRequest.code)
@@ -63,8 +68,14 @@ def post_rsvp() -> Any:
 
 @bp.route("/rsvp/confirmation")
 def get_rsvp_confirmation() -> Any:
-    is_coming = bool(session.get("is_coming"))
-    return render_template("pages/rsvp_confirmation.jinja2", is_coming=is_coming)
+    if "is_coming" in session:
+        is_coming = bool(session["is_coming"])
+        return render_template("pages/rsvp_confirmation.jinja2", is_coming=is_coming)
+    else:
+        flash(
+            "Please complete the RSVP form, if you haven't already. If you already submitted your RSVP, rest assured that we have it!"
+        )
+        return render_template("pages/rsvp.jinja2")
 
 
 @bp.route("/RSVP/<household_cute_name>")
@@ -91,15 +102,19 @@ def post_rsvp_form_ceremony(household_cute_name: str) -> Union[Response, str]:
             guest.name = request.form.get(f"guest-{i}-name")
         # If a plus-one is not coming to the ceremony, they are not coming to the dinner or brunch
         if guest.is_plus_one and not guest.wedding_response:
-            guest.dinner_response = False
             guest.brunch_response = False
+            if household.is_invited_dinner:
+                guest.dinner_response = False
+            _persist_guests([guest])
     session["guests"] = guests
     is_anyone_coming = any(guest.wedding_response for guest in guests)
     if is_anyone_coming is False:
+        logger.warning(f"No one is coming from {household_cute_name} :(")
         _persist_guests(guests)
         session["is_coming"] = False
         return redirect(url_for("rsvp.get_rsvp_confirmation"), code=302)  # No one is coming
     else:
+        logger.warning(f"Someone is coming from {household_cute_name} :)")
         session["is_coming"] = True
         if household.is_invited_dinner:
             return redirect(url_for("rsvp.get_rsvp_form_dinner", household_cute_name=household_cute_name), code=302)

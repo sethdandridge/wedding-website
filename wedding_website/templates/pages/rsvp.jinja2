@@ -7,7 +7,8 @@
       <div class="d-flex justify-content-center align-items-center">
         <form method="POST">
           <div class="mb-3">
-            <label for="name" class="form-label">Please enter your name</label>
+            <label for="name" class="mb-0 form-label">Please enter your name</label>
+            <p class="mt-0">(first and last)</p>
             <input type="text" name="name" class="form-control form-control-lg text-center" id="name">
             {% for message in get_flashed_messages() %}
               <div class="invalid-feedback fs-5">{{ message|e }}</div>

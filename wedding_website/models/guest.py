@@ -1,4 +1,6 @@
 import dataclasses
+from functools import cached_property
+from typing import Optional
 
 from wedding_website.db import get_db_cursor
 from wedding_website.exceptions import GuestNotFoundError
@@ -33,6 +35,26 @@ class Guest:
         return guest
 
     @property
+    def plus_one_owner(self) -> Optional["Guest"]:
+        if self.is_plus_one:
+            with get_db_cursor() as cursor:
+                query = "SELECT * FROM GUEST WHERE household_id = ? AND is_plus_one = 0;"
+                cursor.execute(query, (self.household_id,))
+                row = cursor.fetchone()
+            return Guest(*row)
+        return None
+
+    @property
+    def pretty_name(self) -> str:
+        if self.is_plus_one:
+            assert self.plus_one_owner is not None
+            if self.name:
+                return f"{self.name} ({self.plus_one_owner.name}'s plus-one)"
+            else:
+                return f"{self.plus_one_owner.name}'s plus-one"
+        return self.name
+
+    @cached_property
     def household(self) -> "Household":  # type: ignore  # noqa: F821
         from wedding_website.models.household import Household
 

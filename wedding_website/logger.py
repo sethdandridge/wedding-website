@@ -8,6 +8,32 @@ from flask import Flask, Response, request, session
 from structlog.typing import FilteringBoundLogger
 
 
+class CustomConsoleRenderer(structlog.dev.ConsoleRenderer):
+    # Define the order of columns here
+    KEY_ORDER = (
+        "ip",
+        "method",
+        "url",
+        "status",
+        "correlation_id",
+        "response_time_ms",
+        "body",
+        "user_agent",
+        "cookies",
+        "set_cookies",
+    )
+
+    def __call__(self, _, __, original_event_dict):  # type: ignore
+        new_event_dict = {}
+        for key in self.KEY_ORDER:
+            if key in original_event_dict:
+                new_event_dict[key] = original_event_dict[key]
+        for key, value in original_event_dict.items():
+            if key not in new_event_dict:
+                new_event_dict[key] = value
+        return super().__call__(_, __, new_event_dict)
+
+
 def init_logging(app: Flask) -> None:
     """Initialize logging configuration.
 
@@ -22,7 +48,7 @@ def init_logging(app: Flask) -> None:
         # e.g., add timestamps or log level names.
         structlog.contextvars.merge_contextvars,
         structlog.processors.add_log_level,
-        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.TimeStamper(fmt="%Y-%m-%dT%H:%M:%S"),
     ]
     if app.debug is True:
         processors += [
@@ -38,13 +64,13 @@ def init_logging(app: Flask) -> None:
     if sys.stderr.isatty():
         # Pretty printing when we run in a terminal session.
         # Automatically prints pretty tracebacks when "rich" is installed
-        processors.append(structlog.dev.ConsoleRenderer(sort_keys=False))
+        processors.append(CustomConsoleRenderer(sort_keys=False))
     else:
         # Print JSON when we run, e.g., in a Docker container.
         processors.append(structlog.processors.JSONRenderer(sort_keys=False))
     structlog.configure(
         processors=processors,
-        wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+        wrapper_class=structlog.make_filtering_bound_logger(logging.INFO if app.debug is False else logging.DEBUG),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=True,
@@ -56,22 +82,28 @@ def init_logging(app: Flask) -> None:
     @app.before_request
     def before_request() -> None:
         request.t0 = time.time()
+        ip = request.headers.get("X-Forwarded-For", request.remote_addr)
         structlog.contextvars.bind_contextvars(
-            correlation_id=str(uuid.uuid4()),
+            ip=ip,
             method=request.method,
-            path=request.path,
-            body=request.get_data(as_text=True),
-            ip=request.remote_addr,
+            url=request.headers.get("X-Proxy-Url", request.url),
+            user_agent=request.headers.get("User-Agent"),
+            correlation_id=str(uuid.uuid4()).split("-")[-1],
         )
+        if body := request.get_data(as_text=True):
+            if "urlencoded" not in request.headers.get("Content-Type", ""):
+                body = "<binary>"
+            structlog.contextvars.bind_contextvars(body=body)
         logger.info("Request received", cookies=dict(session))
 
     @app.after_request
     def after_request(response: Response) -> Response:
         response_time_ms = int((time.time() - request.t0) * 1000)
-        logger.info(
-            "Request completed",
-            status=response.status_code,
+        logger.log(
+            logging.INFO if response.status_code < 400 else logging.ERROR,
+            "Request completed" if response.status_code < 400 else "Request errored!",
             set_cookies=dict(session),
+            status=response.status_code,
             response_time_ms=response_time_ms,
         )
         structlog.contextvars.clear_contextvars()

@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS guest_to_alias (
     UNIQUE (alias)
 );
 
+CREATE TABLE IF NOT EXISTS refresh (
+    refreshes INTEGER
+);
+
 /* Populate with test data, upsert if row already exists
 INSERT OR REPLACE INTO household (id, cute_name, is_invited_dinner, is_invited_brunch) VALUES (1, 'solo', 1, 1);
 INSERT OR REPLACE INTO guest (id, household_id, name) VALUES (1, 1, 'Solo Smith');

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.5" />
+  <meta charset="UTF-8">
+  <title>Dog Walks</title>
+</head>
+<body>
+  <span id="countdown"></span>
+
+<script>
+function timeUntil() {
+  let ceremony_time = new Date("2024-07-27T18:00:00-04:00");
+  let now = new Date();
+  let delta = Math.abs(ceremony_time - now) / 1000;
+  let days = Math.floor(delta / 86400);
+  delta -= days * 86400;
+  let hours = Math.floor(delta / 3600) % 24;
+  delta -= hours * 3600;
+  let minutes = Math.floor(delta / 60) % 60;
+  delta -= minutes * 60;
+  let seconds = delta % 60;
+  return_str = Math.floor(seconds).toString() + ' seconds';
+  if (minutes > 0) {
+    return_str = minutes + ' minutes, ' + return_str;
+  }
+  if (hours > 0) {
+    return_str = hours + ' hours, ' + return_str;
+  }
+  if (days > 0) {
+    return_str = days + ' days, ' + return_str;
+  }
+  return return_str;
+}
+
+function refreshTime() {
+  let checkin = document.getElementById('countdown');
+  checkin.innerHTML = timeUntil();
+}
+refreshTime();
+setInterval(refreshTime, 25);
+</script>
+</body>
+</html>
