@@ -49,9 +49,9 @@ class Guest:
         if self.is_plus_one:
             assert self.plus_one_owner is not None
             if self.name:
-                return f"{self.name} ({self.plus_one_owner.name}'s plus-one)"
+                return f"{self.name}"
             else:
-                return f"{self.plus_one_owner.name}'s plus-one"
+                return f"{self.plus_one_owner.name}'s +1"
         return self.name
 
     @cached_property

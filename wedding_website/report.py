@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import Blueprint, Response, request, session
+from flask import Blueprint, render_template, request, session
 
 from wedding_website.db import get_db_cursor
 from wedding_website.models.guest import Guest
@@ -27,7 +27,7 @@ def bucket_by_household_id(guest: list[Guest]) -> list[str]:
     return lines
 
 
-def get_report() -> str:
+def get_report() -> tuple[dict[Any, Any], dict[Any, Any], int]:
     with get_db_cursor() as cursor:
         cursor.execute("SELECT * FROM guest ORDER BY updated DESC;")
         results = cursor.fetchall()
@@ -35,14 +35,9 @@ def get_report() -> str:
         household_results = cursor.fetchall()
         cursor.execute("SELECT * FROM refresh;")
         refreshes = cursor.fetchone()[0]
-        if (
-            "is_sydney" in session
-            or request.headers.get("X-Forwarded-For", request.remote_addr) == "100.8.244.220"
-            or (
-                request.headers.get("User-Agent", "")
-                == "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1"
-                and request.headers.get("X-Forwarded-For", request.remote_addr) == "108.27.236.43"
-            )
+        if "is_sydney" in session or (
+            request.headers.get("User-Agent", "") == "bar"
+            and request.headers.get("X-Forwarded-For", request.remote_addr) == "foo"
         ):
             session.permanent = True
             session["is_sydney"] = 1
@@ -85,34 +80,39 @@ def get_report() -> str:
                 dinner_no.append(guest)
             else:
                 dinner_none.append(guest)
-    lines = []
-    lines.append("Ceremony:")
-    lines.append(" Yes: " + str(len(ceremony_yes)))
-    lines.extend([f"  {c}" for c in bucket_by_household_id(ceremony_yes)])
-    lines.append(" No: " + str(len(ceremony_no)))
-    lines.extend([f"  {c}" for c in bucket_by_household_id(ceremony_no)])
-    lines.append(" Remaining: " + str(len(ceremony_none)))
-    lines.append("")
-    lines.append("Dinner:")
-    lines.append(" Yes: " + str(len(dinner_yes)))
-    lines.extend([f"  {c}" for c in bucket_by_household_id(dinner_yes)])
-    lines.append(" No: " + str(len(dinner_no)))
-    lines.extend([f"  {c}" for c in bucket_by_household_id(dinner_no)])
-    lines.append(" Remaining: " + str(len(dinner_none)))
-    lines.append("")
-    lines.append("Bagel Brunch:")
-    lines.append(" Yes: " + str(len(bagel_brunch_yes)))
-    lines.extend([f"  {c}" for c in bucket_by_household_id(bagel_brunch_yes)])
-    lines.append(" No: " + str(len(bagel_brunch_no)))
-    lines.extend([f"  {c}" for c in bucket_by_household_id(bagel_brunch_no)])
-    lines.append(" Remaining: " + str(len(bagel_brunch_none)))
-    lines.append("")
-    lines.append(f"Number of households responded: {len(households_responded)}/{num_households}")
-    lines.append("")
-    lines.append("Number of times Sydney has refreshed this page: " + str(refreshes))
-    return "\n".join(lines)
+    report = {
+        "Wedding": {
+            "num_yes": len(ceremony_yes),
+            "num_no": len(ceremony_no),
+            "num_none": len(ceremony_none),
+            "yes": bucket_by_household_id(ceremony_yes),
+            "no": bucket_by_household_id(ceremony_no),
+        },
+        "Dinner": {
+            "num_yes": len(dinner_yes),
+            "num_no": len(dinner_no),
+            "num_none": len(dinner_none),
+            "yes": bucket_by_household_id(dinner_yes),
+            "no": bucket_by_household_id(dinner_no),
+        },
+        "Bagel Brunch": {
+            "num_yes": len(bagel_brunch_yes),
+            "num_no": len(bagel_brunch_no),
+            "num_none": len(bagel_brunch_none),
+            "yes": bucket_by_household_id(bagel_brunch_yes),
+            "no": bucket_by_household_id(bagel_brunch_no),
+        },
+    }
+    households = {
+        "responded": len(households_responded),
+        "total": num_households,
+        "yet_to_respond": bucket_by_household_id(ceremony_none),
+    }
+    sydney_refreshes = refreshes
+    return report, households, sydney_refreshes
 
 
-@bp.route("/report/ZtfSdmrSlYcF")
+@bp.route("/report/secret")
 def report() -> Any:
-    return Response(response=get_report(), content_type="text/plain")
+    report, households, sydney_refreshes = get_report()
+    return render_template("report.jinja2", report=report, households=households, sydney_refreshes=sydney_refreshes)

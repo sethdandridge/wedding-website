@@ -30,3 +30,9 @@ document.addEventListener('DOMContentLoaded', function () {
         closeMenu.addEventListener('touchstart', toggleMenu);
     }
 });
+
+document.querySelectorAll('.registry-link').forEach(element => {
+  element.addEventListener('click', function(event) {
+  fetch('/registry-click');
+  });
+});
