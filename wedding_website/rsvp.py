@@ -4,7 +4,7 @@ from flask import Blueprint, Response, current_app, flash, redirect, render_temp
 from werkzeug.exceptions import BadRequest
 
 from wedding_website.client_caching import client_cached
-from wedding_website.exceptions import GuestNotFoundError
+from wedding_website.exceptions import GuestNotFoundError, HouseholdNotFoundError
 from wedding_website.logger import get_logger
 from wedding_website.models.guest import Guest
 from wedding_website.models.household import Household
@@ -84,7 +84,11 @@ def get_rsvp_form_ceremony(household_cute_name: str) -> Any:
     household_cute_name = household_cute_name.lower()
     if "initial_lookup" not in session:
         session["initial_lookup"] = household_cute_name
-    household = Household.from_cute_name(household_cute_name)
+    try:
+        household = Household.from_cute_name(household_cute_name)
+    except HouseholdNotFoundError:
+        # Return 404
+        return render_template("errors/404.jinja2"), 404
     guests = household.guests
     session["guests"] = guests
     return render_template("pages/rsvp_form.jinja2", guests=guests)
@@ -110,6 +114,10 @@ def post_rsvp_form_ceremony(household_cute_name: str) -> Union[Response, str]:
     is_anyone_coming = any(guest.wedding_response for guest in guests)
     if is_anyone_coming is False:
         logger.warning(f"No one is coming from {household_cute_name} :(")
+        for guest in guests:
+            guest.brunch_response = False
+            if household.is_invited_dinner:
+                guest.dinner_response = False
         _persist_guests(guests)
         session["is_coming"] = False
         return redirect(url_for("rsvp.get_rsvp_confirmation"), code=302)  # No one is coming

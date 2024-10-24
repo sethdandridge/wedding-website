@@ -44,3 +44,7 @@ class Household:
     @property
     def cute_subdomain(self) -> str:
         return self.cute_name.replace("-", ".")
+
+    @property
+    def is_responded(self) -> bool:
+        return any(guest.wedding_response is not None for guest in self.guests)

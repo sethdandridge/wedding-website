@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guest Report</title>
+  <style>
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      -moz-control-character-visibility: visible;
+    }
+
+    .nowrap pre {
+      white-space: pre;
+    }
+
+    html:not([dir]) pre { /* Not a UA sheet, so doesn't use :-moz-has-dir-attr */
+      unicode-bidi: plaintext;
+    }
+
+    @-moz-document unobservable-document() {
+      :root {
+        color-scheme: light dark;
+      }
+    }
+
+    @media (width: 0) or (height: 0) {
+      :root {
+        display: none;
+      }
+    }
+    pre {
+      text-indent: -10px;  /* Negative indent */
+      padding-left: 10px; /* Offset for the first line */
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    pre.l1 {
+      margin-left: 0;
+    }
+    pre.l2 {
+      margin-left: 10px;
+    }
+    pre.l3 {
+      margin-left: 20px;
+    }
+    pre.l2 + pre.l1 {
+      margin-top: 10px;
+    }
+    pre.l1 + pre.l1 {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<pre class="l1">Number of households responded: {{ households["responded"] }}/{{ households["total"] }}</pre>
+{% for event_name, details in report.items() %}
+  <pre class="l1">{{ event_name }}</pre>
+  <pre class="l2">Yes: {{ details["num_yes"] }}</pre>
+  {% for household in details['yes'] %}
+    <pre class="l3">{{ household }}</pre>
+  {% endfor %}
+  <pre class="l2">No: {{ details["num_no"] }}</pre>
+  {% for household in details['no'] %}
+    <pre class="l3">{{ household }}</pre>
+  {% endfor %}
+  <pre class="l2">Remaining: {{ details["num_none"] }}</pre>
+{% endfor %}
+<pre class="l1">Households yet to respond:</pre>
+{% for household in households["yet_to_respond"] %}
+  <pre class="l2">{{ household }}</pre>
+{% endfor %}
+<pre class="l1">Number times Sydney has refreshed this page: {{ sydney_refreshes }}</pre>
+</body>
+</html>

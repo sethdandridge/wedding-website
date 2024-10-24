@@ -8,7 +8,9 @@ from flask.logging import default_handler
 from flask.templating import render_template
 
 from wedding_website import db, pages, report, rsvp
-from wedding_website.logger import init_logging
+from wedding_website.logger import get_logger, init_logging
+
+logger = get_logger()
 
 
 def create_app(testing: bool = False) -> Flask:
@@ -48,6 +50,11 @@ def create_app(testing: bool = False) -> Flask:
         response.cache_control.max_age = 60 * 60  # 1 hour
         response.cache_control.no_cache = None
         return response
+
+    @app.route("/registry-click")
+    def registry_click() -> Any:
+        logger.warning("Registry click")
+        return "", 204
 
     @app.errorhandler(404)
     def page_not_found(e: Exception) -> Any:
