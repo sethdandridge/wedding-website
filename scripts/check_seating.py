@@ -15,9 +15,8 @@ with closing(sqlite3.connect("instance/wedding_website_final.sqlite")) as conn:
 
 # Print guests that are in the seating list but not in the website list
 print("Guests in seating list but not in website list:")
-for guest in guests:
-    if guest not in guests_website:
-        print(guest)
+for guest in guests - guests_website:
+    print(guest)
 
 print("Guests in website list but not in seating list:")
 for guest in guests_website:
