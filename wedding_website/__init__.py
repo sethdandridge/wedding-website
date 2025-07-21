@@ -8,6 +8,7 @@ from flask.logging import default_handler
 from flask.templating import render_template
 
 from wedding_website import db, pages, report, rsvp
+from wedding_website.client_caching import client_cached
 from wedding_website.logger import get_logger, init_logging
 
 logger = get_logger()
@@ -44,11 +45,10 @@ def create_app(testing: bool = False) -> Flask:
     def robots_txt() -> Any:
         return send_from_directory("static", "robots.txt")
 
+    @client_cached
     @app.route("/static/<path:filename>")
     def custom_static(filename: str) -> Any:
         response = make_response(send_from_directory("static", filename))
-        response.cache_control.max_age = 60 * 60  # 1 hour
-        response.cache_control.no_cache = None
         return response
 
     @app.route("/registry-click")
