@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wedding-website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wedding-website
+  template:
+    metadata:
+      labels:
+        app: wedding-website
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: wedding-website
+        image: ghcr.io/sethdandridge/wedding-website:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: FLASK_SECRET_KEY
+          value: "INSECURE"
+        resources:
+          requests:
+            cpu: "25m"  # 2.5% of a CPU
+            memory: "32Mi"  # 3%-ish of a Gb
+          limits:
+            cpu: "50m"
+            memory: "64Mi"

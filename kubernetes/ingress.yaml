@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wedding-website
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "seth.and.sydney"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wedding-website
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - "seth.and.sydney"
+      secretName: wedding-website-tls-secret
