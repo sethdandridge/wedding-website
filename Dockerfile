@@ -11,6 +11,8 @@ COPY . .
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONOPTIMIZE=1
 
+RUN mkdir /app/instance
+
 ENTRYPOINT ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "wedding_website:create_app()"]
 
 LABEL org.opencontainers.image.source=https://github.com/sethdandridge/wedding-website

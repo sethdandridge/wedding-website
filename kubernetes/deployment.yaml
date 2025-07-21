@@ -28,4 +28,4 @@ spec:
             memory: "32Mi"  # 3%-ish of a Gb
           limits:
             cpu: "50m"
-            memory: "64Mi"
+            memory: "128Mi"
