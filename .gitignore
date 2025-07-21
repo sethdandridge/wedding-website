@@ -5,9 +5,9 @@
 wedding_website/static/css/custom.css
 instance/
 node_modules/
-fonts/
-css/
+/fonts/
+/css/
 index.html
-images/
+/images/
 scripts/qr_codes/codes/
 *.pyc
