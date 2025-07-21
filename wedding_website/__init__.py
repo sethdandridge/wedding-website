@@ -17,6 +17,7 @@ def create_app(testing: bool = False) -> Flask:
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True, static_folder=None)
     app.config["DATABASE"] = os.path.join(app.instance_path, "wedding_website.sqlite")
+    app.config["SECRET_KEY"] = os.environ["FLASK_SECRET_KEY"]
     app.config["SESSION_PERMANENT"] = True
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=365)
 

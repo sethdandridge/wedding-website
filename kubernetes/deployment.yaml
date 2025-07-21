@@ -24,8 +24,8 @@ spec:
           value: "INSECURE"
         resources:
           requests:
-            cpu: "25m"  # 2.5% of a CPU
-            memory: "32Mi"  # 3%-ish of a Gb
+            cpu: "50m"  # 2.5% of a CPU
+            memory: "64Mi"  # 3%-ish of a Gb
           limits:
             cpu: "50m"
             memory: "128Mi"
