@@ -45,8 +45,8 @@ def create_app(testing: bool = False) -> Flask:
     def robots_txt() -> Any:
         return send_from_directory("static", "robots.txt")
 
-    @client_cached
     @app.route("/static/<path:filename>")
+    @client_cached
     def custom_static(filename: str) -> Any:
         response = make_response(send_from_directory("static", filename))
         return response
